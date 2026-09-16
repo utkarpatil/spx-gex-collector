@@ -1,0 +1,2 @@
+collected_at,session_date,market_time,expiry,spot,net_b,net_full_b,abs_b,regime,condition,magnet,magnet_frac,call_wall,put_wall,flip,flip_type,call_oi,put_oi,pcr_oi,call_vol,put_vol
+2026-09-16T17:02:43Z,2026-09-16,1302,2026-09-16,7612.35,-1.791,-1.792,25.015,balanced,C8_coil_pin,7625.0,0.165,7620.0,7600.0,7600.0,mixed,46020,44043,0.957,437697,331827
