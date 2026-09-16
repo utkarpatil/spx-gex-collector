@@ -139,18 +139,25 @@ def collect(force=False):
         fh.write(json.dumps(rec) + "\n")
 
     # 2) one-row summary -> master CSV (opens in Excel)
+    net_full_b = round(sum(r["net"] for r in rows) / 1e9, 3)   # net over the WHOLE chain
+    call_oi = sum(r["coi"] for r in win40); put_oi = sum(r["poi"] for r in win40)
+    pcr_oi = round(put_oi / call_oi, 3) if call_oi else ""
     csv_path = os.path.join(OUT, "gex_live.csv")
-    cols = ["collected_at", "session_date", "market_time", "spot", "net_b", "abs_b",
-            "regime", "condition", "magnet", "call_wall", "put_wall", "flip", "flip_type",
-            "call_vol", "put_vol"]
+    cols = ["collected_at", "session_date", "market_time", "expiry", "spot",
+            "net_b", "net_full_b", "abs_b", "regime", "condition",
+            "magnet", "magnet_frac", "call_wall", "put_wall", "flip", "flip_type",
+            "call_oi", "put_oi", "pcr_oi", "call_vol", "put_vol"]
     new = not os.path.exists(csv_path)
     with open(csv_path, "a", newline="", encoding="utf-8") as cf:
         w = csv.DictWriter(cf, fieldnames=cols, extrasaction="ignore")
         if new: w.writeheader()
         w.writerow(dict(collected_at=collected, session_date=t.strftime("%Y-%m-%d"),
-                        market_time=mtime, spot=round(spot, 2), net_b=net_b, abs_b=abs_b,
-                        regime=regime, condition=condition, magnet=magnet, call_wall=call_wall,
-                        put_wall=put_wall, flip=flip if flip is not None else "", flip_type=ftype,
+                        market_time=mtime, expiry=expiry, spot=round(spot, 2),
+                        net_b=net_b, net_full_b=net_full_b, abs_b=abs_b, regime=regime,
+                        condition=condition, magnet=magnet, magnet_frac=round(magfrac, 3),
+                        call_wall=call_wall, put_wall=put_wall,
+                        flip=flip if flip is not None else "", flip_type=ftype,
+                        call_oi=call_oi, put_oi=put_oi, pcr_oi=pcr_oi,
                         call_vol=cvol, put_vol=pvol))
     log("saved %s %d  spot=%.2f net=%.2fB %s/%s strikes=%d" %
         (t.strftime("%Y-%m-%d"), mtime, spot, net_b, regime, condition, len(ws)))
