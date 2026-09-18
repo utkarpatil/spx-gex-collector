@@ -5,8 +5,11 @@ name: Collect SPX GEX
 # until the market closes. GitHub only has to launch it once per session.
 on:
   schedule:
-    - cron: "31 13 * * 1-5"   # ~9:31 ET during EDT (Mar–Nov)
-    - cron: "31 14 * * 1-5"   # ~9:31 ET during EST (Nov–Mar); also covers the tail via the queue
+    # Many near-open triggers so at least one fires early despite GitHub's delays.
+    # Once any run starts, the internal loop covers the rest of the session.
+    - cron: "2,17,32,47 13 * * 1-5"   # EDT morning (9:02–9:47 ET)
+    - cron: "2,17,32,47 14 * * 1-5"   # EST morning (9:02–9:47 ET) / EDT mid-morning backup
+    - cron: "2,32 15 * * 1-5"         # extra catch-up if all earlier ones were skipped
   workflow_dispatch: {}        # run manually any time (e.g. mid-session to start now)
 
 permissions:
